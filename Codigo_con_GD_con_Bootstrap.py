@@ -68,7 +68,7 @@ for sm in range(simulaciones):
     
     print("Simulación: ", sm + 1)
 
-    iteraciones = 10
+    iteraciones = 150
     ENS_1_año = []
     ENS_iteraciones = []
 
@@ -92,8 +92,9 @@ for sm in range(simulaciones):
             
             inicio_periodo = time.time()
             
-#-------------------------------------------- Inserción de GD por iteración --------------------------------------------------------------------------------------------------
-            
+#------------------------------------------------------------------------------------
+#                    CREACIÓN CURVA DE CARGA DE GD
+#------------------------------------------------------------------------------------    
           
             num_generacion_distribuida = num_generacion_distribuida + 1
             
@@ -105,8 +106,7 @@ for sm in range(simulaciones):
             buses_list = np.random.choice(38, size=num_generacion_distribuida, replace=False)
             print(buses_list)
            
-            for gen_ind in range (num_generacion_distribuida):
-                
+            for gen_ind in range (num_generacion_distribuida):                
 
                 buses = buses_list[gen_ind]
                 potencias_pico_MW = np.random.uniform(7.5*0.4, 1104*0.4)    
@@ -120,22 +120,28 @@ for sm in range(simulaciones):
                 
                 print(f"Se agrega generación en el bus: {buses} con potencia de: {potencias_pico_MW:.2f}")
 
-#             # 📌 Graficar las curvas de generación de todos los generadores
-#             plt.figure(figsize=(12, 6))
-# 
-#             for gen_i, curva_i in curvas_pv.items():
-#                 plt.plot(horas, curva_i, marker='o', linestyle='-', label=f"Generador industial {gen_i}")
-# 
-#             plt.xlabel("Hora del día")
-#             plt.ylabel("Generación (MW)")
-#             plt.title("Curva de Generación Fotovoltaica por Nodo")
-#             plt.grid()
-#             plt.legend()
-#             plt.show()            
+            # Graficar las curvas de generación de todos los generadores
+            plt.figure(figsize=(12, 6))
+ 
+            for gen_i, curva_i in curvas_pv.items():
+                plt.plot(horas, curva_i, marker='o', linestyle='-', label=f"Generador industial {gen_i}")
+ 
+            plt.xlabel("Hora del día")
+            plt.ylabel("Generación (MW)")
+            plt.title("Curva de Generación Fotovoltaica por Nodo")
+            plt.grid()
+            plt.legend()
+            plt.show()   
+            
+#------------------------------------------------------------------------------------
+#                    CREACIÓN DEL REGIMEN DE OPERACIÓN DE LOS ACTIVOS
+#------------------------------------------------------------------------------------           
                        
             n = [0] * Datos_carga.shape[0]
             t = [0] * Datos_carga.shape[0]
             ENS_por_bus = [0] * Datos_carga.shape[0]
+
+#-------------------------------------------------------LINEAS-----------------------------------------------------------------
 
             TTF = [[] for _ in range(Val)]
             TTR = [[] for _ in range(Val)]
@@ -179,22 +185,22 @@ for sm in range(simulaciones):
                     if indice_tiempo >= len(tiempo):
                         break
                     
-#             Lineas_grafica = 5
-# 
-#             fig, axs = plt.subplots(Lineas_grafica, 1, figsize=(12, 10))  # 5 filas, 1 columna
-#             Colores_graficas = ['blue','pink','green','orange','purple']
-# 
-#             for k in Lineas_grafica:
-#                 axs[k].plot(tiempo, OP[k], drawstyle='steps-pre', label=f'Linea {k}', color=Colores_graficas[k])
-#                 axs[k].set_xlabel("Tiempo (h)",fontsize=10)
-#                 axs[k].set_ylabel("Amplitud",fontsize=10)
-#                 axs[k].set_yticks(np.arange(0, 1.5, 1)) 
-#                 axs[k].grid(True)
-#                 axs[k].legend()
-#             plt.subplots_adjust(hspace=0.8)
-#             plt.show()
+             Lineas_grafica = 5
+ 
+             fig, axs = plt.subplots(Lineas_grafica, 1, figsize=(12, 10))  # 5 filas, 1 columna
+             Colores_graficas = ['blue','pink','green','orange','purple']
+ 
+             for k in Lineas_grafica:
+                 axs[k].plot(tiempo, OP[k], drawstyle='steps-pre', label=f'Linea {k}', color=Colores_graficas[k])
+                 axs[k].set_xlabel("Tiempo (h)",fontsize=10)
+                 axs[k].set_ylabel("Amplitud",fontsize=10)
+                 axs[k].set_yticks(np.arange(0, 1.5, 1)) 
+                 axs[k].grid(True)
+                 axs[k].legend()
+             plt.subplots_adjust(hspace=0.8)
+             plt.show()
 
-#-------------------------------------------------------TRANSFORMADORES________________________________________________________________________________________
+#-------------------------------------------------------TRANSFORMADORES-----------------------------------------------------------------
 
             Val_tr = Datos_trafo.shape[0]
             TTF_TR = [[] for _ in range(Val_tr)]
@@ -249,22 +255,22 @@ for sm in range(simulaciones):
                     if indice_tiempo_tr >= len(tiempo_tr):
                         break
                          
-#             trafos_grafica = 5
-# 
-#             fig, axs = plt.subplots(trafos_grafica, 1, figsize=(12, 10))
-#             Colores_graficas = ['blue','pink','green','orange','purple']
-# 
-#             for k in range(trafos_grafica):
-#                 axs[k].plot(tiempo_tr, OP_tr[k], drawstyle='steps-pre', label=f'Trafo {k}', color=Colores_graficas[k])
-#                 axs[k].set_xlabel("Tiempo (h)",fontsize=10)
-#                 axs[k].set_ylabel("Amplitud",fontsize=10)
-#                 axs[k].set_yticks(np.arange(0, 1.5, 1)) 
-#                 axs[k].grid(True)
-#                 axs[k].legend()
-#             plt.subplots_adjust(hspace=0.8) 
-#             plt.show()
-
-#__________________________________________________________GENERADORES________________________________________________________________________________________
+             trafos_grafica = 5
+            
+             fig, axs = plt.subplots(trafos_grafica, 1, figsize=(12, 10))
+             Colores_graficas = ['blue','pink','green','orange','purple']
+ 
+             for k in range(trafos_grafica):
+                 axs[k].plot(tiempo_tr, OP_tr[k], drawstyle='steps-pre', label=f'Trafo {k}', color=Colores_graficas[k])
+                 axs[k].set_xlabel("Tiempo (h)",fontsize=10)
+                 axs[k].set_ylabel("Amplitud",fontsize=10)
+                 axs[k].set_yticks(np.arange(0, 1.5, 1)) 
+                 axs[k].grid(True)
+                 axs[k].legend()
+             plt.subplots_adjust(hspace=0.8) 
+             plt.show()
+            
+#-------------------------------------------------------GENERADORES----------------------------------------------------------
 
             Val_gr = Datos_gen.shape[0]
             TTF_gr = [[] for _ in range(Val_gr)]
@@ -329,23 +335,23 @@ for sm in range(simulaciones):
                     if indice_tiempo_gr >= len(tiempo_gr):
                         break
                     
-#             gen_grafica = 5
-# 
-#             fig, axs = plt.subplots(gen_grafica, 1, figsize=(12, 10))
-#             Colores_graficas = ['blue','pink','green','orange','purple']
-# 
-#             for k in range(gen_grafica):
-#                 axs[k].plot(tiempo_gr, OP_gr[k], drawstyle='steps-pre', label=f'Generador {k}', color=Colores_graficas[k])
-#                 axs[k].set_xlabel("Tiempo (h)",fontsize=10)
-#                 axs[k].set_ylabel("Amplitud",fontsize=10)
-#                 axs[k].set_yticks(np.arange(0, 1.5, 1)) 
-#                 axs[k].grid(True)
-#                 axs[k].legend()    
-#             plt.subplots_adjust(hspace=0.8) 
-#             plt.show()
+             gen_grafica = 5
+ 
+             fig, axs = plt.subplots(gen_grafica, 1, figsize=(12, 10))
+             Colores_graficas = ['blue','pink','green','orange','purple']
+ 
+             for k in range(gen_grafica):
+                 axs[k].plot(tiempo_gr, OP_gr[k], drawstyle='steps-pre', label=f'Generador {k}', color=Colores_graficas[k])
+                 axs[k].set_xlabel("Tiempo (h)",fontsize=10)
+                 axs[k].set_ylabel("Amplitud",fontsize=10)
+                 axs[k].set_yticks(np.arange(0, 1.5, 1)) 
+                 axs[k].grid(True)
+                 axs[k].legend()    
+             plt.subplots_adjust(hspace=0.8) 
+             plt.show()
             
 #------------------------------------------------------------------------------------
-# 
+#                               FLUJO DE POTENCIA
 #------------------------------------------------------------------------------------
             
             print("...............Corriendo Flujo de potencia.....................")
